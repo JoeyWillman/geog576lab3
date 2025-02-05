@@ -6,11 +6,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="" />
 
-  <!-- calls for the arcgis api's CSS file and JS library -->
+  <!-- calls for the ArcGIS API's CSS file and JS library -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
   <script src="https://js.arcgis.com/4.25/"></script>
 
-  <!-- Adding the modules, API key, and map constant needed for a full-screen map app -->
   <script>
     require([
       "esri/config",
@@ -20,13 +19,13 @@
       "esri/layers/GraphicsLayer",
       "esri/layers/FeatureLayer",
       "esri/widgets/Editor",
-      "esri/widgets/Legend" // Added the Legend module
+      "esri/widgets/Legend"
     ], function (esriConfig, Map, MapView, Graphic, GraphicsLayer, FeatureLayer, Editor, Legend) {
 
       esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNKOxZzGksmd9odtipfMrCKhlUL7auZpitHz5p7XawaMdGKgRj-ybuRoJSAruPYpDWR-xjlL7q9anX9RZTFi6okxC69vm5audoPUqPT0sW7pjDTbgRcCVVAXRgKb9D5H5zaPA-oqQHbW2uiKh62goj2P4dQaxFDXvd9fQndw_bQlfySRneTGOnFPmVwB9_RvZ5JnpllUQuKIwpIQdpgELv53GTcQB4NvHv5Kl6GAd44AT1_iYlozOde";
 
       const map = new Map({
-        basemap: "arcgis-topographic" // Basemap layer
+        basemap: "arcgis-topographic"
       });
 
       const view = new MapView({
@@ -39,83 +38,40 @@
       const graphicsLayer = new GraphicsLayer();
       map.add(graphicsLayer);
 
-      // Create a point (Stevie Ray Vaughan Statue)
-      const point = {
-        type: "point",
-        longitude: -97.750689,
-        latitude: 30.263098
-      };
-
-      const simpleMarkerSymbol = {
-        type: "simple-marker",
-        color: [0, 0, 139],
-        outline: { color: [255, 255, 255], width: 1 }
-      };
-
-      const popupTemplate = {
-        title: "{Name}",
-        content: "{Description}"
-      };
-
-      const attributes = {
-        Name: "Stevie Ray Vaughan Statue",
-        Description: "A bronze sculpture of Stevie Ray Vaughan by Ralph Helmick"
-      };
-
-      const pointGraphic = new Graphic({
-        geometry: point,
-        symbol: simpleMarkerSymbol,
-        attributes: attributes,
-        popupTemplate: popupTemplate
-      });
-
-      graphicsLayer.add(pointGraphic);
-
-      // Feature Layer: Colleges & Universities
-      const usaeduLayer = new FeatureLayer({
-        url: "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Colleges_and_Universities_View/FeatureServer",
-        outFields: ["NAME", "TOT_ENROLL"],
-        popupTemplate: { title: "EDUs", content: "<b>Name:</b> {NAME}<br><b>Total Enrollment:</b> {TOT_ENROLL}<br>" }
-      });
-
-      map.add(usaeduLayer);
-
-      // Feature Layer: Airports
-      const airportRenderer = {
-        "type": "simple",
-        "symbol": {
-          "type": "picture-marker",
-          "url": "https://sounny.github.io/agol/outline_local_airport_black_24dp.png",
-          "width": "18px",
-          "height": "18px"
+      // Feature Layer: My Airports Joey (Fixed image URL & labels)
+      const myAirportsRenderer = {
+        type: "simple",
+        symbol: {
+          type: "picture-marker",
+          url: "https://JoeyWillman.github.io/geog576lab3/luggage.png", // Fixed URL
+          width: "18px",
+          height: "18px"
         }
       };
 
-      const airportLabels = {
+      const myAirportsLabels = {
         symbol: {
           type: "text",
-          color: "#FFFFFF",
-          haloColor: "#5E8D74",
+          color: "#000000",
+          haloColor: "#FFFFFF",
           haloSize: "2px",
-          font: { size: "12px", family: "Noto Sans", style: "italic", weight: "normal" }
+          font: {
+            size: "12px",
+            family: "Arial",
+            weight: "bold"
+          }
         },
         labelPlacement: "above-center",
-        labelExpressionInfo: { expression: "$feature.Fac_Name" }
+        labelExpressionInfo: {
+          expression: "$feature.AirportCode" // Fixed label reference
+        }
       };
 
-      const airportLayer = new FeatureLayer({
-        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/US_Airports/FeatureServer",
-        renderer: airportRenderer,
-        definitionExpression: "Fac_Type = 'AIRPORT'",
-        labelingInfo: [airportLabels]
-      });
-
-      map.add(airportLayer);
-
-      // Feature Layer: My Airports (Fixed URL)
       const myAirports = new FeatureLayer({
         url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/My_Airports_Joey/FeatureServer",
-        outFields: ["AirportCode"]
+        outFields: ["AIRPORTCODE"],
+        renderer: myAirportsRenderer,
+        labelingInfo: [myAirportsLabels]
       });
 
       map.add(myAirports);
@@ -132,9 +88,7 @@
       const legend = new Legend({
         view: view,
         layerInfos: [
-          { layer: usaeduLayer, title: "Colleges & Universities" },
-          { layer: airportLayer, title: "Airports" },
-          { layer: myAirports, title: "My Airports" }
+          { layer: myAirports, title: "My Airports (Joey)" }
         ]
       });
 
@@ -142,7 +96,6 @@
     });
   </script>
 
-  <!-- CSS for full-screen map -->
   <style>
     html, body, #viewDiv {
       padding: 0;
@@ -155,7 +108,6 @@
 </head>
 <body>
 
-  <!-- The div to display the map -->
   <div id="viewDiv"></div>
 
 </body>
